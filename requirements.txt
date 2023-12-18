@@ -1,4 +1,4 @@
 requests==0.0.0
 six==0.0.0
 python-chess==1.999
-chess==0.0.0
+chess==1.10.0

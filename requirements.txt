@@ -1,4 +1,4 @@
-requests
-six
-python-chess
-chess
+requests==0.0.0
+six==0.0.0
+python-chess==0.0.0
+chess==0.0.0

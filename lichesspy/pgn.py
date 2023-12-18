@@ -1,55 +1,173 @@
-""""
- File: api.py
- Package: lichesspy
- Author: ESkopp
- Created: 12/01/2021
- Modified: 03/12/2023
- Version: 6.0.0
-"""
-
-import re
+from datetime import datetime
+from six import StringIO
 
 
-def parse_pgn(pgn_string):
-    """Parse a PGN string and return a list of games as dictionaries."""
-    games = []
-    pgn_blocks = _extract_pgn_blocks(pgn_string)
-    for pgn_block in pgn_blocks:
-        game = _parse_pgn_block(pgn_block)
-        games.append(game)
-    return games
+def _node(g, spec):
+    parts = spec.split(".")
+    for p in parts:
+        if p not in g:
+            return None
+        g = g[p]
+    return str(g)
 
 
-def _extract_pgn_blocks(pgn_string):
-    """Extract PGN blocks from a PGN string."""
-    pgn_blocks = re.split(r"\s*\n\n", pgn_string)
-    pgn_blocks = [block.strip() for block in pgn_blocks if block.strip()]
-    return pgn_blocks
+def _cap(s):
+    if len(s) == 0:
+        return s
+    return s[0].upper() + s[1:]
 
 
-def _parse_pgn_block(pgn_block):
-    """Parse a PGN block and return a game as a dictionary."    ""
-    game = {}
-    tags, moves = pgn_block.split("\n\n", maxsplit=1)
-    game["tags"] = _parse_pgn_tags(tags)
-    game["moves"] = _parse_pgn_moves(moves)
-    return game
+def from_game(game, headers=None):
+    """Converts a JSON game to a PGN string.
+
+    :game: The game object.
+    :headers: An optional dictionary with custom PGN headers.
+
+    >>> game = lichesspy.api.game('Qa7FJNk2', with_moves=1)
+    >>> pgn = lichess.pgn.from_game(game)
+    >>> print(pgn)
+    [Event "Casual rapid game"]
+    ...
+    """
+    if headers is None:
+        headers = {}
+    else:
+        headers = dict(headers)
+    g = game
+    if "moves" not in g:
+        raise ValueError(
+            "The provided game doesn't have any moves. Maybe you forgot to set with_moves=1 on the API call?"
+        )
+
+    result = (
+        "1/2-1/2"
+        if _node(g, "status") == "draw"
+        else "1-0"
+        if _node(g, "winner") == "white"
+        else "0-1"
+        if _node(g, "winner") == "black"
+        else "*"
+    )
+    h = []
+    h.append(
+        ("Event", "%s %s game" % ("Rated" if g["rated"] else "Casual", g["speed"]))
+    )
+    h.append(("Site", "https://lichess.org/%s" % g["id"]))
+    h.append(
+        (
+            "Date",
+            datetime.fromtimestamp(int(g["createdAt"]) / 1000.0).strftime("%Y.%m.%d"),
+        )
+    )
+    h.append(("Round", "?"))
+    h.append(("White", _node(g, "players.white.userId") or "?"))
+    h.append(("Black", _node(g, "players.black.userId") or "?"))
+    h.append(("Result", result))
+    h.append(("WhiteElo", _node(g, "players.white.rating") or "?"))
+    h.append(("BlackElo", _node(g, "players.black.rating") or "?"))
+    h.append(("ECO", _node(g, "opening.eco")))
+    h.append(("Opening", _node(g, "opening.name")))
+    if g["variant"] == "fromPosition":
+        h.append(("FEN", g["initialFen"]))
+    elif g["variant"] != "standard":
+        h.append(("Variant", _cap(g["variant"])))
+    if g["speed"] != "correspondence":
+        h.append(
+            (
+                "TimeControl",
+                _node(g, "clock.initial") + "+" + _node(g, "clock.increment"),
+            )
+        )
+    moves = g["moves"]
+    pgn = ""
+    for i in h:
+        key = i[0]
+        value = headers.pop(key, i[1])
+        if value is not None:
+            pgn += '[{} "{}"]\n'.format(key, value)
+    pgn += "\n"
+    ply = 0
+    for m in moves.split(" "):
+        if ply % 2 == 0:
+            pgn += str(int(ply / 2 + 1)) + ". "
+        pgn += m + " "
+        ply += 1
+    pgn += result
+    pgn += "\n"
+    return pgn
 
 
-def _parse_pgn_tags(tags_string):
-    """Parse PGN tags and return a dictionary of tag name-value pairs."""
-    tags = {}
-    tag_lines = tags_string.split("\n")
-    for tag_line in tag_lines:
-        if tag_line.strip():
-            name, value = tag_line.strip().split(maxsplit=1)
-            name = name.strip('["]')
-            value = value.strip('["]')
-            tags[name] = value
-    return tags
+def io_from_game(game, headers=None):
+    """Like :data:`~lichess.pgn.from_game`, except it wraps the result in :data:`StringIO`.
+
+    This allows easy integration with the `python-chess <https://github.com/niklasf/python-chess>`_ library.
+    But if this is all you need, see the :mod:`lichess.format` module for an easier way.
+
+    :game: The game object.
+    :headers: An optional dictionary with custom PGN headers.
+
+    >>> import lichesspy.api
+    >>> import lichess.pgn
+    >>> import chess.pgn
+    >>>
+    >>> api_game = lichesspy.api.game('Qa7FJNk2', with_moves=1)
+    >>> game = chess.pgn.read_game(lichess.pgn.io_from_game(api_game))
+    >>> print(game.end().board())
+    . . k . R b r .
+    . p p r . N p .
+    p . . . . . . p
+    . . . . . . . .
+    . . . p . . . .
+    P . . P . . . P
+    . P P . . P P .
+    . . K R . . . .
+    """
+    return StringIO(from_game(game, headers))
 
 
-def _parse_pgn_moves(moves_string):
-    """Parse PGN moves and return a list of moves."""
-    moves = moves_string.split()
-    return moves
+def _validate_games(games):
+    if isinstance(games, dict) and "currentPageResults" in games:
+        raise ValueError(
+            "The games argument must be a list. You provided a paginator. Use ['currentPageResults'] to get the games list, or use an API method that returns a generator."
+        )
+
+
+def from_games(games, headers=None):
+    """Converts an enumerable of JSON games to a PGN string.
+
+    :games: The enumerable of game objects.
+    :headers: An optional dictionary with (shared) custom PGN headers.
+
+    >>> import itertools
+    >>>
+    >>> games = lichesspy.api.user_games('cyanfish', with_moves=1)
+    >>> pgn = lichess.pgn.from_games(itertools.islice(games, 5))
+    >>> print(pgn.count('\\n'))
+    66
+    """
+    _validate_games(games)
+    return "\n".join((from_game(g, headers) for g in games))
+
+
+def save_games(games, path, headers=None):
+    """Saves an enumerable of JSON games to a PGN file.
+
+    :games: The enumerable of game objects.
+    :path: The path of the .pgn file to save.
+    :headers: An optional dictionary with (shared) custom PGN headers.
+
+    >>> import itertools
+    >>>
+    >>> games = lichesspy.api.user_games('cyanfish', with_moves=1)
+    >>> lichess.pgn.save_games(itertools.islice(games, 5), 'mylast5games.pgn')
+
+    """
+    _validate_games(games)
+    with open(path, "wb") as fout:
+        first = True
+        for g in games:
+            if first:
+                first = False
+            else:
+                fout.write("\n".encode("utf-8"))
+            fout.write(from_game(g, headers).encode("utf-8"))

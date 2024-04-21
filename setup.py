@@ -28,7 +28,7 @@ setuptools.setup(
     ],
     python_requires=">=3.10",
     install_requires=[
-        'requests==2.0.0',
+        'requests==2.31.0',
         'six==1.16.0',
         'chess==1.10.0'
     ]

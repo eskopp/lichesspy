@@ -24,8 +24,8 @@ Checking who's online and playing:
 >>> import lichesspy.api
 >>>
 >>> users = list(lichesspy.api.users_status(['thibault', 'cyanfish']))
->>> online = [u['id'] for u in users if u['online']]
->>> playing = [u['id'] for u in users if u['playing']]
+>>> online = [u['id'] for u in users if u.get('online', False)]
+>>> playing = [u['id'] for u in users if u.get('playing', False)]
 >>> print(online, playing)
 ['thibault', 'cyanfish'] ['cyanfish']
 ```

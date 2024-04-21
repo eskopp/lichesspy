@@ -64,3 +64,6 @@ Installing
 ```shell
 pip install lichesspy
 ```
+
+
+# Farewell

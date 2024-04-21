@@ -42,11 +42,11 @@ def from_game(game, headers=None):
     result = (
         "1/2-1/2"
         if _node(g, "status") == "draw"
-        else "1-0"
-        if _node(g, "winner") == "white"
-        else "0-1"
-        if _node(g, "winner") == "black"
-        else "*"
+        else (
+            "1-0"
+            if _node(g, "winner") == "white"
+            else "0-1" if _node(g, "winner") == "black" else "*"
+        )
     )
     h = []
     h.append(

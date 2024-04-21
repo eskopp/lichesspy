@@ -1,12 +1,14 @@
 import setuptools
 from pathlib import Path
 
+
 def load_readme():
     """Load and return the content of the README file."""
     readme_path = Path("README.rst")
     if readme_path.exists():
         return readme_path.read_text(encoding="utf-8")
     return "Long description could not be read from README.rst"
+
 
 setuptools.setup(
     name="lichesspy",

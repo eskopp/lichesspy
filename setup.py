@@ -1,12 +1,14 @@
 import setuptools
 from pathlib import Path
 
+
 def load_readme():
     """Load and return the content of the README file."""
     readme_path = Path("README.rst")
     if readme_path.exists():
         return readme_path.read_text(encoding="utf-8")
     return "Long description could not be read from README.rst"
+
 
 setuptools.setup(
     name="lichesspy",
@@ -27,9 +29,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
-    install_requires=[
-        'requests==2.0.0',
-        'six==1.16.0',
-        'chess==1.10.0'
-    ]
+    install_requires=["requests==2.0.0", "six==1.16.0", "chess==1.10.0"],
 )

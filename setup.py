@@ -1,19 +1,6 @@
 import setuptools
 from pathlib import Path
 
-
-def load_requirements():
-    """Load and return list of requirements from a file."""
-    requirements_path = Path("requirements.txt")
-    try:
-        return requirements_path.read_text(encoding="utf-8").splitlines()
-    except Exception as error:
-        # Depending on how critical this file is, you may want to raise an error
-        # raise RuntimeError(f"Unable to read the requirements file: {error}")
-        print(f"Exception when reading requirements: {error}")
-        return []
-
-
 def load_readme():
     """Load and return the content of the README file."""
     readme_path = Path("README.rst")
@@ -21,10 +8,9 @@ def load_readme():
         return readme_path.read_text(encoding="utf-8")
     return "Long description could not be read from README.rst"
 
-
 setuptools.setup(
     name="lichesspy",
-    version="6.0.4.dev3",
+    version="6.0.4.dev4",
     author="eskopp",
     author_email="skopp.erik+lichesspy@gmail.com",
     description="Python wrapper for lichess",
@@ -41,5 +27,9 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
-    install_requires=load_requirements(),
+    install_requires=[
+        'requests==2.0.0',
+        'six==1.16.0',
+        'chess==1.10.0'
+    ]
 )

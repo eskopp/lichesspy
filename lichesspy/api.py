@@ -2,8 +2,8 @@ import json
 import requests
 import time
 from six.moves import urllib
-import lichess.format
-import lichess.auth
+import lichesspy.format as lichess
+import lichesspy.auth as lichess
 
 
 class ApiError(Exception):

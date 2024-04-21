@@ -2,8 +2,8 @@ import json
 import requests
 import time
 from six.moves import urllib
-import lichesspy.format
-import lichesspy.auth
+import lichess.format
+import lichess.auth
 
 
 class ApiError(Exception):
@@ -50,8 +50,8 @@ class DefaultApiClient(object):
         params=None,
         post_data=None,
         auth=None,
-        format=lichesspy.format.JSON,
-        object_type=lichesspy.format.PUBLIC_API_OBJECT,
+        format=lichess.format.JSON,
+        object_type=lichess.format.PUBLIC_API_OBJECT,
     ):
         """Makes an API call, prepending :data:`~lichesspy.api.DefaultApiClient.base_url` to the provided path. HTTP GET is used unless :data:`post_data` is provided.
 
@@ -64,9 +64,9 @@ class DefaultApiClient(object):
             time.sleep(1)
 
         if auth is None:
-            auth = lichesspy.auth.EMPTY
+            auth = lichess.auth.EMPTY
         elif isinstance(auth, str):
-            auth = lichesspy.auth.OAuthToken(auth)
+            auth = lichess.auth.OAuthToken(auth)
         headers = auth.headers()
         stream = format.stream(object_type)
         content_type = format.content_type(object_type)
@@ -134,17 +134,17 @@ Initially set to an instance of :class:`~lichesspy.api.DefaultApiClient`.
 # Helpers for API functions
 
 
-def _api_get(path, params, object_type=lichesspy.format.PUBLIC_API_OBJECT):
+def _api_get(path, params, object_type=lichess.format.PUBLIC_API_OBJECT):
     client = params.pop("client", default_client)
-    auth = params.pop("auth", lichesspy.auth.EMPTY)
-    format = params.pop("format", lichesspy.format.JSON)
+    auth = params.pop("auth", lichess.auth.EMPTY)
+    format = params.pop("format", lichess.format.JSON)
     return client.call(path, params, auth=auth, format=format, object_type=object_type)
 
 
-def _api_post(path, params, post_data, object_type=lichesspy.format.PUBLIC_API_OBJECT):
+def _api_post(path, params, post_data, object_type=lichess.format.PUBLIC_API_OBJECT):
     client = params.pop("client", default_client)
-    auth = params.pop("auth", lichesspy.auth.EMPTY)
-    format = params.pop("format", lichesspy.format.JSON)
+    auth = params.pop("auth", lichess.auth.EMPTY)
+    format = params.pop("format", lichess.format.JSON)
     return client.call(
         path, params, post_data, auth=auth, format=format, object_type=object_type
     )
@@ -205,7 +205,7 @@ def users_by_team(team, **kwargs):
     return _api_get(
         "/api/team/{}/users".format(team),
         kwargs,
-        object_type=lichesspy.format.STREAM_OBJECT,
+        object_type=lichess.format.STREAM_OBJECT,
     )
 
 
@@ -267,7 +267,7 @@ def game(game_id, **kwargs):
     >>> print(game['moves'])
     e4 e5 Nf3 Nc6 Bc4 Qf6 d3 h6 ...
 
-    >>> from lichesspy.format import PGN, PYCHESS
+    >>> from lichess.format import PGN, PYCHESS
     >>> pgn = lichesspy.api.game('Qa7FJNk2', format=PGN)
     >>> print(pgn)
     [Event "Casual rapid game"]
@@ -287,7 +287,7 @@ def game(game_id, **kwargs):
     return _api_get(
         "/game/export/{}".format(game_id),
         kwargs,
-        object_type=lichesspy.format.GAME_OBJECT,
+        object_type=lichess.format.GAME_OBJECT,
     )
 
 
@@ -305,7 +305,7 @@ def games_by_ids_page(ids, **kwargs):
         "/games/export/_ids",
         kwargs,
         ",".join(ids),
-        object_type=lichesspy.format.GAME_STREAM_OBJECT,
+        object_type=lichess.format.GAME_STREAM_OBJECT,
     )
 
 
@@ -319,7 +319,7 @@ def user_games(username, **kwargs):
     >>> print(next(games)['moves'])
     e4 e5 Nf3 Nc6 Bc4 Qf6 d3 h6 ...
 
-    >>> from lichesspy.format import PGN, SINGLE_PGN, PYCHESS
+    >>> from lichess.format import PGN, SINGLE_PGN, PYCHESS
     >>> pgns = lichesspy.api.user_games('cyanfish', max=50, format=PGN)
     >>> print(next(pgns))
     [Event "Casual rapid game"]
@@ -344,7 +344,7 @@ def user_games(username, **kwargs):
     return _api_get(
         "/api/games/user/{}".format(username),
         kwargs,
-        object_type=lichesspy.format.GAME_STREAM_OBJECT,
+        object_type=lichess.format.GAME_STREAM_OBJECT,
     )
 
 
@@ -354,7 +354,7 @@ def current_game(username, **kwargs):
     return _api_get(
         "/api/user/{}/current-game".format(username),
         kwargs,
-        object_type=lichesspy.format.GAME_OBJECT,
+        object_type=lichess.format.GAME_OBJECT,
     )
 
 
@@ -402,7 +402,7 @@ def cloud_eval(fen, **kwargs):
 def login(username, password):
     cookie_jar = _api_post(
         "/login",
-        {"format": lichesspy.format.COOKIES},
+        {"format": lichess.format.COOKIES},
         {"username": username, "password": password},
     )
-    return lichesspy.auth.Cookie(cookie_jar)
+    return lichess.auth.Cookie(cookie_jar)

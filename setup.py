@@ -22,7 +22,7 @@ def def_readme():
 
 setuptools.setup(
     name="lichesspy",
-    version="6.0.1",
+    version="6.0.2",
     author="eskopp",
     author_email="skopp.erik@gmail.com",
     description="Python wrapper for lichess",

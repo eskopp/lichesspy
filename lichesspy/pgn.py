@@ -24,7 +24,7 @@ def from_game(game, headers=None):
     :headers: An optional dictionary with custom PGN headers.
 
     >>> game = lichesspy.api.game('Qa7FJNk2', with_moves=1)
-    >>> pgn = lichess.pgn.from_game(game)
+    >>> pgn = lichesspy.pgn.from_game(game)
     >>> print(pgn)
     [Event "Casual rapid game"]
     ...
@@ -42,17 +42,17 @@ def from_game(game, headers=None):
     result = (
         "1/2-1/2"
         if _node(g, "status") == "draw"
-        else "1-0"
-        if _node(g, "winner") == "white"
-        else "0-1"
-        if _node(g, "winner") == "black"
-        else "*"
+        else (
+            "1-0"
+            if _node(g, "winner") == "white"
+            else "0-1" if _node(g, "winner") == "black" else "*"
+        )
     )
     h = []
     h.append(
         ("Event", "%s %s game" % ("Rated" if g["rated"] else "Casual", g["speed"]))
     )
-    h.append(("Site", "https://lichess.org/%s" % g["id"]))
+    h.append(("Site", "https://lichesspy.org/%s" % g["id"]))
     h.append(
         (
             "Date",
@@ -98,20 +98,20 @@ def from_game(game, headers=None):
 
 
 def io_from_game(game, headers=None):
-    """Like :data:`~lichess.pgn.from_game`, except it wraps the result in :data:`StringIO`.
+    """Like :data:`~lichesspy.pgn.from_game`, except it wraps the result in :data:`StringIO`.
 
     This allows easy integration with the `python-chess <https://github.com/niklasf/python-chess>`_ library.
-    But if this is all you need, see the :mod:`lichess.format` module for an easier way.
+    But if this is all you need, see the :mod:`lichesspy.format` module for an easier way.
 
     :game: The game object.
     :headers: An optional dictionary with custom PGN headers.
 
     >>> import lichesspy.api
-    >>> import lichess.pgn
+    >>> import lichesspy.pgn
     >>> import chess.pgn
     >>>
     >>> api_game = lichesspy.api.game('Qa7FJNk2', with_moves=1)
-    >>> game = chess.pgn.read_game(lichess.pgn.io_from_game(api_game))
+    >>> game = chess.pgn.read_game(lichesspy.pgn.io_from_game(api_game))
     >>> print(game.end().board())
     . . k . R b r .
     . p p r . N p .
@@ -141,7 +141,7 @@ def from_games(games, headers=None):
     >>> import itertools
     >>>
     >>> games = lichesspy.api.user_games('cyanfish', with_moves=1)
-    >>> pgn = lichess.pgn.from_games(itertools.islice(games, 5))
+    >>> pgn = lichesspy.pgn.from_games(itertools.islice(games, 5))
     >>> print(pgn.count('\\n'))
     66
     """
@@ -159,7 +159,7 @@ def save_games(games, path, headers=None):
     >>> import itertools
     >>>
     >>> games = lichesspy.api.user_games('cyanfish', with_moves=1)
-    >>> lichess.pgn.save_games(itertools.islice(games, 5), 'mylast5games.pgn')
+    >>> lichesspy.pgn.save_games(itertools.islice(games, 5), 'mylast5games.pgn')
 
     """
     _validate_games(games)

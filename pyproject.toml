@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lichesspy"
-version = "6.0.1"
+version = "6.0.2"
 description = "Python wrapper for lichess"
 license = "MIT"
 classifiers = ["Programming Language :: Python :: 3", "License :: OSI Approved :: MIT License", "Operating System :: OS Independent"]

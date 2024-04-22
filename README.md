@@ -9,7 +9,7 @@ It is designed to be:
 
 * Adaptable to API changes
 
-Getting a user's rating:
+## Getting a user's rating:
 
 ```python
 >>> import lichesspy.api
@@ -30,7 +30,7 @@ Checking who's online and playing:
 ['thibault', 'cyanfish'] ['cyanfish']
 ```
 
-Saving a PGN of a user's last 200 games:
+## Saving a PGN of a user's last 200 games:
 
 ```python
 >>> import lichesspy.api
@@ -41,7 +41,7 @@ Saving a PGN of a user's last 200 games:
 >>>    f.write(pgn)
 ```
 
-Integrating with python-chess:
+## Integrating with lichesspy:
 
 ```python
 >>> import lichesspy.api
@@ -59,7 +59,7 @@ P . . P . . . P
 . . K R . . . .
 ```
 
-Installing
+# Installing
 ----------
 ```shell
 pip install lichesspy

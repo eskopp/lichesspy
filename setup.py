@@ -4,7 +4,7 @@ from pathlib import Path
 
 def load_readme():
     """Load and return the content of the README file."""
-    readme_path = Path("README.rst")
+    readme_path = Path("README.md")
     if readme_path.exists():
         return readme_path.read_text(encoding="utf-8")
     return "Long description could not be read from README.rst"
@@ -12,7 +12,7 @@ def load_readme():
 
 setuptools.setup(
     name="lichesspy",
-    version="6.0.5.dev0",
+    version="6.0.5.dev1",
     author="eskopp",
     author_email="skopp.erik+lichesspy@gmail.com",
     description="Python wrapper for lichess",

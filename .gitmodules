@@ -1,0 +1,9 @@
+[submodule "dependencies/python-chess"]
+	path = dependencies/python-chess
+	url = https://github.com/niklasf/python-chess.git
+[submodule "dependencies/requests"]
+	path = dependencies/requests
+	url = https://github.com/psf/requests.git
+[submodule "dependencies/six"]
+	path = dependencies/six
+	url = https://github.com/benjaminp/six.git

@@ -29,5 +29,5 @@ setuptools.setup(
         "Operating System :: OS Independent",
     ],
     python_requires=">=3.10",
-    install_requires=["requests==2.31.0", "six==1.16.0", "chess==1.10.0"],
+    install_requires=["requests==2.32.1", "six==1.16.0", "chess==1.10.0"],
 )

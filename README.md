@@ -1,23 +1,24 @@
-A client for the lichess.org API
-================================================
+# A client for the lichess.org API
+
 This is a client library for the Lichess API.
 It is designed to be:
 
-* Easy to use
+- Easy to use
 
-* Customizable when you need it
+- Customizable when you need it
 
-* Adaptable to API changes
+- Adaptable to API changes
 
 ## Getting a user's rating:
 
 ```python
 >>> import lichesspy.api
->>> 
+>>>
 >>> user = lichesspy.api.user('thibault')
 >>> print(user['perfs']['blitz']['rating'])
 1617
 ```
+
 Checking who's online and playing:
 
 ```python
@@ -35,7 +36,7 @@ Checking who's online and playing:
 ```python
 >>> import lichesspy.api
 >>> from lichesspy.format import SINGLE_PGN
->>> 
+>>>
 >>> pgn = lichesspy.api.user_games('thibault', max=200, format=SINGLE_PGN)
 >>> with open('last200.pgn', 'w') as f:
 >>>    f.write(pgn)
@@ -46,7 +47,7 @@ Checking who's online and playing:
 ```python
 >>> import lichesspy.api
 >>> from lichesspy.format import PYCHESS
->>> 
+>>>
 >>> game = lichesspy.api.game('Qa7FJNk2', format=PYCHESS)
 >>> print(game.end().board())
 . . k . R b r .
@@ -60,10 +61,11 @@ P . . P . . . P
 ```
 
 # Installing
-----------
+
+---
+
 ```shell
 pip install lichesspy
 ```
-
 
 # Farewell

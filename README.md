@@ -62,7 +62,7 @@ P . . P . . . P
 
 # Installing
 
----
+
 
 ```shell
 pip install lichesspy
